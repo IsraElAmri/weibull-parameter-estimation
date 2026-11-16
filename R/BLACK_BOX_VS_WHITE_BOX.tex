@@ -1,0 +1,299 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={White-Box vs.~Black-Box: Weibull Estimation in R},
+  pdfauthor={Reliability Analysis Project},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{White-Box vs.~Black-Box: Weibull Estimation in R}
+\author{Reliability Analysis Project}
+\date{2026-04-27}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\section{Introduction}\label{introduction}
+
+In the main \texttt{02\_estimation\_methods.R} script, we implemented
+\textbf{``White-Box''} code. This means we manually defined the
+underlying mathematics (like explicitly writing the log-likelihood
+functions, algebra for Bergman Weights, and root-finding for Moments).
+We did this to create an authentic educational pipeline where students
+can see exactly \emph{how} the algorithms arrive at their parameters.
+
+However, in a production environment where you just want results
+quickly, R provides \textbf{``Black-Box''} functions. These are
+optimized, robust, one-liner functions embedded in standard packages
+that solve the same problems instantly.
+
+This document contrasts the verbosity of our educational code against
+the brevity of production-ready packages.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{1. Maximum Likelihood Estimation
+(MLE)}\label{maximum-likelihood-estimation-mle}
+
+MLE is the industry standard for estimating Weibull parameters with
+right-censored data.
+
+\subsubsection{The Detailed ``White-Box''
+Approach}\label{the-detailed-white-box-approach}
+
+In our code, we explicitly mapped the failure likelihoods against the
+censored survival probabilities, resulting in an \textasciitilde30-line
+custom implementation passed to a general-purpose optimizer
+(\texttt{optim}):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Manual Log{-}Likelihood \& Nelder{-}Mead Optimization (\textasciitilde{}30 Lines)}
+\NormalTok{neg\_loglik }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(log\_params) \{}
+\NormalTok{  k   }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(log\_params[}\DecValTok{1}\NormalTok{])}
+\NormalTok{  lam }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(log\_params[}\DecValTok{2}\NormalTok{])}
+  
+\NormalTok{  t\_ratio }\OtherTok{\textless{}{-}}\NormalTok{ t }\SpecialCharTok{/}\NormalTok{ lam}
+  
+  \CommentTok{\# Log{-}PDF for failures}
+\NormalTok{  ll\_fail }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(event }\SpecialCharTok{*}\NormalTok{ (}\FunctionTok{log}\NormalTok{(k) }\SpecialCharTok{{-}} \FunctionTok{log}\NormalTok{(lam) }\SpecialCharTok{+}\NormalTok{ (k }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{) }\SpecialCharTok{*} \FunctionTok{log}\NormalTok{(t\_ratio) }\SpecialCharTok{{-}}\NormalTok{ t\_ratio}\SpecialCharTok{\^{}}\NormalTok{k))}
+  \CommentTok{\# Log{-}survival for censored}
+\NormalTok{  ll\_cens }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{((}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ event) }\SpecialCharTok{*}\NormalTok{ (}\SpecialCharTok{{-}}\NormalTok{t\_ratio}\SpecialCharTok{\^{}}\NormalTok{k))}
+  
+  \FunctionTok{return}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{(ll\_fail }\SpecialCharTok{+}\NormalTok{ ll\_cens))}
+\NormalTok{\}}
+
+\NormalTok{result }\OtherTok{\textless{}{-}} \FunctionTok{optim}\NormalTok{(}\AttributeTok{par =} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FloatTok{1.5}\NormalTok{), }\FunctionTok{log}\NormalTok{(mean\_t)), }
+                \AttributeTok{fn =}\NormalTok{ neg\_loglik, }
+                \AttributeTok{method =} \StringTok{"Nelder{-}Mead"}\NormalTok{)}
+
+\NormalTok{k\_hat   }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(result}\SpecialCharTok{$}\NormalTok{par[}\DecValTok{1}\NormalTok{])}
+\NormalTok{lam\_hat }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(result}\SpecialCharTok{$}\NormalTok{par[}\DecValTok{2}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{The ``Black-Box''
+One-Liner}\label{the-black-box-one-liner}
+
+In production, you would never write your own likelihood function. You
+would use the \texttt{survival} package, which is arguably the most
+battle-tested survival analysis library in existence.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Using the survival package (1 Line)}
+\FunctionTok{library}\NormalTok{(survival)}
+
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{survreg}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(lifetime\_days, failed) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ drive\_data, }\AttributeTok{dist =} \StringTok{"weibull"}\NormalTok{)}
+
+\CommentTok{\# Note: survreg uses the "Extreme Value" parameterization. }
+\CommentTok{\# To convert to standard Weibull shape/scale:}
+\NormalTok{k\_hat   }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ fit}\SpecialCharTok{$}\NormalTok{scale}
+\NormalTok{lam\_hat }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\FunctionTok{coef}\NormalTok{(fit))}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Code Reduction:} \textbf{30 lines} down to \textbf{1 line}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{2. OLS / Median Rank Regression
+(MRR)}\label{ols-median-rank-regression-mrr}
+
+OLS fits a linear regression line to coordinate transformations of the
+empirical failures.
+
+\subsubsection{The Detailed ``White-Box''
+Approach}\label{the-detailed-white-box-approach-1}
+
+We manually calculated Benard's median ranks, transformed the axes to
+the Weibull scale, and explicitly applied R's \texttt{lm()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Manual Rank Transformation (\textasciitilde{}15 lines)}
+\NormalTok{t\_fail }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(drive\_data}\SpecialCharTok{$}\NormalTok{lifetime\_days[drive\_data}\SpecialCharTok{$}\NormalTok{failed }\SpecialCharTok{==} \DecValTok{1}\NormalTok{])}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(t\_fail)}
+
+\CommentTok{\# Benard\textquotesingle{}s formula}
+\NormalTok{i }\OtherTok{\textless{}{-}} \FunctionTok{seq\_len}\NormalTok{(n)}
+\NormalTok{F\_i }\OtherTok{\textless{}{-}}\NormalTok{ (i }\SpecialCharTok{{-}} \FloatTok{0.3}\NormalTok{) }\SpecialCharTok{/}\NormalTok{ (n }\SpecialCharTok{+} \FloatTok{0.4}\NormalTok{)}
+
+\CommentTok{\# Linearization}
+\NormalTok{Y }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{log}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ F\_i)) }
+\NormalTok{X }\OtherTok{\textless{}{-}} \FunctionTok{log}\NormalTok{(t\_fail)}
+
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ X)}
+\NormalTok{k\_hat   }\OtherTok{\textless{}{-}} \FunctionTok{unname}\NormalTok{(}\FunctionTok{coef}\NormalTok{(fit)[}\DecValTok{2}\NormalTok{])}
+\NormalTok{lam\_hat }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{unname}\NormalTok{(}\FunctionTok{coef}\NormalTok{(fit)[}\DecValTok{1}\NormalTok{]) }\SpecialCharTok{/}\NormalTok{ k\_hat)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{The ``Black-Box''
+One-Liner}\label{the-black-box-one-liner-1}
+
+If you need Rank Regression in R, the specialized \texttt{WeibullR}
+package handles all of this automatically, converting and plotting in
+one swift move.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Using WeibullR (1 Line)}
+\FunctionTok{library}\NormalTok{(WeibullR)}
+
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{wblr.fit}\NormalTok{(}\FunctionTok{wblr}\NormalTok{(t\_fail), }\AttributeTok{method.fit =} \StringTok{"rr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Code Reduction:} \textbf{15 lines} down to \textbf{1 line}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{3. Kaplan-Meier Survival
+Benchmark}\label{kaplan-meier-survival-benchmark}
+
+The Kaplan-Meier estimator is exactly what we just added to the lecture
+documents to prove why MLE works better than WLS for censored drives.
+
+\subsubsection{The Detailed ``White-Box''
+Approach}\label{the-detailed-white-box-approach-2}
+
+Plotting this manually requires grouping data, keeping track of the risk
+set at each time step \(t\), calculating running survival probabilities
+\(\prod (1 - d_i/n_i)\), and building a step-function graph. If coded
+sequentially, it easily takes \textbf{20-40 lines}.
+
+\subsubsection{The ``Black-Box''
+One-Liner}\label{the-black-box-one-liner-2}
+
+The \texttt{survival} package calculates this using the formula
+instantly.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Using survival and broom for instant calculation (\textasciitilde{}2 Lines)}
+\FunctionTok{library}\NormalTok{(survival)}
+
+\NormalTok{km\_fit }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(lifetime\_days, failed) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ drive\_data)}
+\CommentTok{\# Plotting is as easy as:}
+\FunctionTok{plot}\NormalTok{(km\_fit, }\AttributeTok{conf.int =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{mark.time =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Conclusion}\label{conclusion}
+
+While the \textbf{White-Box} code makes our project significantly
+longer, it acts as a digital textbook. It strips away the magic of
+libraries like \texttt{survival} and \texttt{WeibullR} to reveal exactly
+how statistical mathematics translates to code.
+
+When you move into actual corporate analytics, you will discard the
+detailed scripts found in \texttt{02\_estimation\_methods.R} and instead
+pipeline everything through the \textbf{Black-Box} one-liners shown
+above!
+
+\end{document}

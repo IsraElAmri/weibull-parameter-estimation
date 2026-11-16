@@ -1,0 +1,143 @@
+---
+title: "White-Box vs. Black-Box: Weibull Estimation in R"
+author: "Reliability Analysis Project"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    theme: flatly
+    highlight: tango
+  pdf_document:
+    toc: true
+    keep_tex: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+# Introduction
+
+In the main `02_estimation_methods.R` script, we implemented **"White-Box"** code. This means we manually defined the underlying mathematics (like explicitly writing the log-likelihood functions, algebra for Bergman Weights, and root-finding for Moments). We did this to create an authentic educational pipeline where students can see exactly *how* the algorithms arrive at their parameters.
+
+However, in a production environment where you just want results quickly, R provides **"Black-Box"** functions. These are optimized, robust, one-liner functions embedded in standard packages that solve the same problems instantly. 
+
+This document contrasts the verbosity of our educational code against the brevity of production-ready packages.
+
+---
+
+# 1. Maximum Likelihood Estimation (MLE)
+
+MLE is the industry standard for estimating Weibull parameters with right-censored data.
+
+### The Detailed "White-Box" Approach
+In our code, we explicitly mapped the failure likelihoods against the censored survival probabilities, resulting in an ~30-line custom implementation passed to a general-purpose optimizer (`optim`):
+
+```{r}
+# Manual Log-Likelihood & Nelder-Mead Optimization (~30 Lines)
+neg_loglik <- function(log_params) {
+  k   <- exp(log_params[1])
+  lam <- exp(log_params[2])
+  
+  t_ratio <- t / lam
+  
+  # Log-PDF for failures
+  ll_fail <- sum(event * (log(k) - log(lam) + (k - 1) * log(t_ratio) - t_ratio^k))
+  # Log-survival for censored
+  ll_cens <- sum((1 - event) * (-t_ratio^k))
+  
+  return(-(ll_fail + ll_cens))
+}
+
+result <- optim(par = c(log(1.5), log(mean_t)), 
+                fn = neg_loglik, 
+                method = "Nelder-Mead")
+
+k_hat   <- exp(result$par[1])
+lam_hat <- exp(result$par[2])
+```
+
+### The "Black-Box" One-Liner
+In production, you would never write your own likelihood function. You would use the `survival` package, which is arguably the most battle-tested survival analysis library in existence. 
+
+```{r}
+# Using the survival package (1 Line)
+library(survival)
+
+fit <- survreg(Surv(lifetime_days, failed) ~ 1, data = drive_data, dist = "weibull")
+
+# Note: survreg uses the "Extreme Value" parameterization. 
+# To convert to standard Weibull shape/scale:
+k_hat   <- 1 / fit$scale
+lam_hat <- exp(coef(fit))
+```
+
+*Code Reduction:* **30 lines** down to **1 line**.
+
+---
+
+# 2. OLS / Median Rank Regression (MRR)
+
+OLS fits a linear regression line to coordinate transformations of the empirical failures.
+
+### The Detailed "White-Box" Approach
+We manually calculated Benard's median ranks, transformed the axes to the Weibull scale, and explicitly applied R's `lm()` function:
+
+```{r}
+# Manual Rank Transformation (~15 lines)
+t_fail <- sort(drive_data$lifetime_days[drive_data$failed == 1])
+n <- length(t_fail)
+
+# Benard's formula
+i <- seq_len(n)
+F_i <- (i - 0.3) / (n + 0.4)
+
+# Linearization
+Y <- log(-log(1 - F_i)) 
+X <- log(t_fail)
+
+fit <- lm(Y ~ X)
+k_hat   <- unname(coef(fit)[2])
+lam_hat <- exp(-unname(coef(fit)[1]) / k_hat)
+```
+
+### The "Black-Box" One-Liner
+If you need Rank Regression in R, the specialized `WeibullR` package handles all of this automatically, converting and plotting in one swift move.
+
+```{r}
+# Using WeibullR (1 Line)
+library(WeibullR)
+
+fit <- wblr.fit(wblr(t_fail), method.fit = "rr")
+```
+
+*Code Reduction:* **15 lines** down to **1 line**.
+
+---
+
+# 3. Kaplan-Meier Survival Benchmark
+
+The Kaplan-Meier estimator is exactly what we just added to the lecture documents to prove why MLE works better than WLS for censored drives.
+
+### The Detailed "White-Box" Approach
+Plotting this manually requires grouping data, keeping track of the risk set at each time step $t$, calculating running survival probabilities $\prod (1 - d_i/n_i)$, and building a step-function graph. If coded sequentially, it easily takes **20-40 lines**.
+
+### The "Black-Box" One-Liner
+The `survival` package calculates this using the formula instantly.
+
+```{r}
+# Using survival and broom for instant calculation (~2 Lines)
+library(survival)
+
+km_fit <- survfit(Surv(lifetime_days, failed) ~ 1, data = drive_data)
+# Plotting is as easy as:
+plot(km_fit, conf.int = TRUE, mark.time = TRUE)
+```
+
+---
+
+# Conclusion
+
+While the **White-Box** code makes our project significantly longer, it acts as a digital textbook. It strips away the magic of libraries like `survival` and `WeibullR` to reveal exactly how statistical mathematics translates to code. 
+
+When you move into actual corporate analytics, you will discard the detailed scripts found in `02_estimation_methods.R` and instead pipeline everything through the **Black-Box** one-liners shown above!

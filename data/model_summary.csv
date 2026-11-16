@@ -1,0 +1,4 @@
+model,n_total,n_failures,n_censored,censoring_pct,min_lifetime,median_lifetime,max_lifetime
+TOSHIBA MG07ACA14TA,37463,116,37347,99.69,1,92,92
+TOSHIBA MG08ACA16TA,40184,85,40099,99.79,1,92,92
+WDC WUH722222ALE6L4,40271,50,40221,99.88,1,92,92
