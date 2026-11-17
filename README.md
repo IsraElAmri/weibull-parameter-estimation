@@ -1,188 +1,104 @@
-# Performance Evaluation of Methods for Weibull Distribution Parameter Estimation
-## Application to Backblaze Hard Drive Failure Data (Q3 2025)
+﻿# Weibull Parameter Estimation on Hard Drive Failure Data
 
-A complete two-language project (R + Python) implementing **9 Weibull parameter estimation methods**, **8 goodness-of-fit metrics**, and an **interactive Streamlit dashboard** for reliability analysis of hard drive failure data.
+[![R](https://img.shields.io/badge/R-4.3+-276DC3?logo=r&logoColor=white)](https://www.r-project.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
----
+Comparative statistical reliability analysis and interactive Streamlit dashboard benchmarking 9 Weibull parameter estimation methods on 117,918 hard drives from the Backblaze Q3 2025 dataset (92-day observational window).
 
-## 📁 Project Structure
+## Key Reliability Findings
+
+Across 117,918 hard drives monitored over 92 days, only 251 drives failed (99.69% to 99.88% right-censoring rate across the 3 dominant drive models: TOSHIBA MG07ACA14TA, TOSHIBA MG08ACA16TA, and WDC WUH722222ALE6L4).
+
+1. **Failure-Only Methods Discarding Censored Drives**:
+   - Classical methods that ignore right-censored drives (OLS, WLS, MOM, L-Moments, EPF, Percentile) estimate a scale parameter $\lambda \approx 50\text{--}59\text{ days}$.
+   - This result is mathematically misleading: predicting a characteristic life of 50-60 days for a fleet where over 99.7% of drives survived the full 92-day window occurs because the algorithms fit only the ~250 failed units.
+2. **Censoring-Aware Methods (MLE and Bayesian MCMC)**:
+   - Maximum Likelihood Estimation accounting for right-censoring and Bayesian MCMC (via `brms`/Stan) incorporate the full survival history of non-failed drives.
+   - MLE and MCMC consistently agree: shape parameter $k \approx 1.0\text{--}1.3$ (indicating a roughly constant hazard rate during early-to-mid service) and realistic fleet characteristic lifetimes $\lambda \approx 11,800\text{--}43,000\text{ days}$ (32 to 118 years).
+   - MCMC 95% posterior credible intervals for $k$ include or closely bound 1.0.
+3. **Goodness-of-Fit Paradox**:
+   - Standard residual metrics (RMSE, Kolmogorov-Smirnov) evaluated only on observed failure timestamps paradoxically rank the failure-only methods best.
+   - Information criteria (AIC, BIC) correctly penalize models that cannot account for fleet-wide survival probabilities.
+
+## Estimation Methods Benchmarked
+
+| Method | Implementation | Censoring Handling |
+|---|---|---|
+| **OLS** | Ordinary Least Squares on Weibull probability paper | Discards censored drives |
+| **WLS** | Weighted Least Squares (variance-weighted) | Discards censored drives |
+| **MOM** | Method of Moments ($E[X], \text{Var}(X)$) | Discards censored drives |
+| **L-Moments** | Linear combinations of order statistics | Discards censored drives |
+| **EPF** | Empirical Probability Function | Discards censored drives |
+| **Percentile** | Two-point percentile matching ($t_{0.10}, t_{0.90}$) | Discards censored drives |
+| **MLE** | Maximum Likelihood with log-likelihood survival term | Right-censoring aware |
+| **MAP** | Maximum A Posteriori (Lognormal informative prior) | Right-censoring aware (prior-sensitive) |
+| **MCMC** | Full Bayesian Hamiltonian Monte Carlo (brms / Stan) | Right-censoring aware |
+
+## Repository Structure
 
 ```
-weibull_project/
-├── data/
-│   ├── README_data.md          # Dataset documentation
-│   ├── drives_clean.csv        # Generated: one row per drive
-│   └── model_summary.csv       # Generated: per-model statistics
-├── R/
-│   ├── 01_data_prep.R          # Data loading, cleaning, survival data
-│   ├── 02_estimation_methods.R # 9 estimation methods + sensitivity analysis
-│   ├── 03_gof_metrics.R        # 8 GoF metrics + composite ranking
-│   ├── 04_plots.R              # 8 plot types × 3 models = 24 PNGs
-│   ├── 05_report.Rmd           # Technical report (code visible)
-│   ├── CODE_EXPLAINED.Rmd      # Line-by-line code explanation
-│   ├── FINAL_REPORT.Rmd        # Academic paper format
-│   └── results/
-│       ├── parameters.csv      # 9 methods × 3 models estimates
-│       ├── gof_metrics.csv     # All GoF metrics
-│       ├── sensitivity_analysis.csv
-│       ├── brms_fit_*.rds      # MCMC posterior fits (cached)
-│       └── plots/              # 24 PNG files at 300 DPI
-├── python/
-│   └── dashboard.py            # Streamlit interactive dashboard
-├── packages.R                  # R package installer
-├── requirements.txt            # Python dependencies
-└── README.md                   # This file
+weibull-parameter-estimation/
+â”œâ”€â”€ .gitignore
+â”œâ”€â”€ LICENSE
+â”œâ”€â”€ README.md
+â”œâ”€â”€ packages.R
+â”œâ”€â”€ requirements.txt
+â”œâ”€â”€ R/
+â”‚   â”œâ”€â”€ 01_data_prep.R
+â”‚   â”œâ”€â”€ 02_estimation_methods.R
+â”‚   â”œâ”€â”€ 03_gof_metrics.R
+â”‚   â”œâ”€â”€ 04_plots.R
+â”‚   â”œâ”€â”€ BLACK_BOX_VS_WHITE_BOX.Rmd
+â”‚   â””â”€â”€ results/
+â”‚       â”œâ”€â”€ brms_fit_*.rds
+â”‚       â”œâ”€â”€ gof_metrics.csv
+â”‚       â”œâ”€â”€ parameters.csv
+â”‚       â”œâ”€â”€ sensitivity_analysis.csv
+â”‚       â”œâ”€â”€ plots/
+â”‚       â””â”€â”€ plots_combined/
+â”œâ”€â”€ data/
+â”‚   â”œâ”€â”€ README_data.md
+â”‚   â”œâ”€â”€ drives_clean.csv
+â”‚   â””â”€â”€ model_summary.csv
+â”œâ”€â”€ data_exploration/
+â”‚   â”œâ”€â”€ figure3_1.png
+â”‚   â”œâ”€â”€ figure3_2.png
+â”‚   â”œâ”€â”€ figure3_3.png
+â”‚   â””â”€â”€ generate_figures.py
+â””â”€â”€ python/
+    â””â”€â”€ dashboard.py
 ```
 
-## 📊 Methods Implemented
+## Running the Project
 
-| # | Method | Principle | Handles Censoring | 
-|---|--------|-----------|-------------------|
-| 1 | **OLS** (= MRR) | Rank regression on Weibull paper | ✗ |
-| 2 | **WLS** | Bergman (1986) delta-method weights | ✗ |
-| 3 | **MOM** | Moment matching (CV²) | ✗ |
-| 4 | **L-Moments** | Hosking (1990) linear moments | ✗ (>5%) |
-| 5 | **EPF** | Energy pattern factor (E[T³]/(E[T])³) | ✗ |
-| 6 | **MLE** | Censored log-likelihood, Nelder-Mead | ✓ |
-| 7A | **MAP** | Bayesian posterior mode, exponential priors | ✓ |
-| 7B | **MCMC** ★ | Full Bayesian via brms/Stan (HMC-NUTS) | ✓ |
-| 8 | **Percentile** | Two-quantile analytical method | ✗ |
+### Interactive Dashboard (Python / Streamlit)
 
-★ MCMC is an **extension** beyond core course materials — provides full posterior distributions with credible intervals.
-
-## 🏗️ Setup & Installation
-
-### 1. Download Backblaze Data
-
-1. Go to https://www.backblaze.com/cloud-storage/resources/hard-drive-test-data
-2. Download the **Q3 2025** dataset (or your target quarter)
-3. Extract all daily CSV files
-4. Either:
-   - Place them in `weibull_project/data/`, **or**
-   - Update `DATA_RAW_DIR` at the top of `R/01_data_prep.R` to point to your CSV directory
-
-### 2. Install R Packages
-
-```bash
-Rscript packages.R
-```
-
-This installs: tidyverse, survival, brms, rstan, bayesplot, kableExtra, DiagrammeR, tinytex, and others.
-
-### 3. Install Python Packages
+The Streamlit dashboard executes all parameter estimations directly in Python via SciPy and NumPy, loading from the shipped dataset `data/drives_clean.csv`:
 
 ```bash
 pip install -r requirements.txt
-```
-
-Optional — for exact environment replication:
-```bash
-pip freeze > requirements_exact.txt
-```
-
-## 🚀 Running the Analysis Pipeline
-
-Execute the R scripts **in order** (each depends on the previous):
-
-```bash
-# Step 1: Load & clean data → data/drives_clean.csv
-Rscript R/01_data_prep.R
-
-# Step 2: Estimate parameters → R/results/parameters.csv
-Rscript R/02_estimation_methods.R
-
-# Step 3: Compute GoF metrics → R/results/gof_metrics.csv
-Rscript R/03_gof_metrics.R
-
-# Step 4: Generate all plots → R/results/plots/*.png
-Rscript R/04_plots.R
-```
-
-### Render Reports (Optional)
-
-```bash
-# Technical report (echo=TRUE, all code visible)
-Rscript -e "rmarkdown::render('R/05_report.Rmd')"
-
-# Line-by-line code explanation (teaching document)
-Rscript -e "rmarkdown::render('R/CODE_EXPLAINED.Rmd')"
-
-# Academic paper (echo=FALSE, publication format)
-Rscript -e "rmarkdown::render('R/FINAL_REPORT.Rmd')"
-```
-
-### Launch Dashboard
-
-```bash
 streamlit run python/dashboard.py
 ```
 
-The dashboard reads **only** from `R/results/` — no statistical computation in Python.
+### Full R Analysis Pipeline
 
-## ⏱️ Runtime Notes
+To run the complete statistical estimation and Bayesian Stan sampling:
 
-| Step | Approximate Time |
-|------|-----------------|
-| `01_data_prep.R` | 5–15 min (reads ~11 GB of CSVs) |
-| `02_estimation_methods.R` | 5–30 min per model for MCMC |
-| `03_gof_metrics.R` | < 1 min |
-| `04_plots.R` | 1–3 min |
-| Reports (Rmd) | 2–5 min each |
-| Dashboard | Instant (reads CSVs) |
+```bash
+Rscript packages.R
+Rscript R/01_data_prep.R
+Rscript R/02_estimation_methods.R
+Rscript R/03_gof_metrics.R
+Rscript R/04_plots.R
+```
 
-**MCMC caching**: Method 7B results are saved as `.rds` files. On subsequent runs, existing fits are loaded instead of refitted. Delete the `.rds` file to force a refit.
+## Dashboard Preview
 
-## 🎯 Key Features
+![Dashboard](assets/dashboard.png)
 
-### Mathematical Rigor
-- Every method includes **full derivations** in code comments
-- **Sanity checks** on all parameter estimates (k > 0, λ > 0, range warnings)
-- **Convergence reporting** for MLE and MAP (optim convergence codes)
-- **Double verification** for L-Moments (pairwise vs single-sum formula)
-- **EPF approximation check** (exact vs empirical k ≈ 1 + 3.69/EPF²)
+## License
 
-### Statistical Completeness
-- **8 GoF metrics**: KS, RMSE, MAE, Anderson-Darling, AIC, AICc, BIC, MRL error
-- **Composite ranking** via Borda count (rank_RMSE + rank_AD + rank_AIC) / 3
-- **Sensitivity analysis**: EPF outlier contamination vs MOM, L-Moments, MLE
-- **Decision logic**: method elimination based on censoring thresholds
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Reproducibility
-- `set.seed(42)` in all scripts
-- `sessionInfo()` in reports
-- Exact package versions via `packages.R`
-- All constants named and explained — no magic numbers
-
-## 📋 Decision Logic Summary
-
-| Censoring Level | Eliminate | Retain |
-|----------------|-----------|--------|
-| > 0% | Percentile, MOM, EPF | MLE, MAP, MCMC |
-| > ~5% | + L-Moments | MLE, MAP, MCMC |
-| > ~20% | + OLS, WLS | MLE, MAP, MCMC |
-
-**Secondary criteria**:
-- Prior knowledge + small n → MCMC (honest uncertainty)
-- Prior knowledge, quick estimate → MAP
-- No prior, large dataset → MLE
-- Complete data, outliers → L-Moments
-- Complete data, clean → WLS
-
-## 📐 Key Insights
-
-- **OLS = MRR**: Identical computation. No need to implement both.
-- **Flat prior + MAP = MLE**: Algebraically proven. Exponential prior adds regularization.
-- **WLS can outrank MLE**: When the true distribution is only approximately Weibull.
-- **MCMC wide CI ≠ weakness**: It's what the data tells you.
-- **EPF is fragile**: One observation at 2× the mean → 8× effect on the cube.
-
-## 📚 References
-
-1. Weibull W. (1951). *J. Applied Mechanics*, 18, 293–297.
-2. Benard A. & Bos-Levenbach E.C. (1953). *Statistica*, 7, 163–173.
-3. Bergman B. (1986). *J. Materials Science Letters*, 5, 611–614.
-4. Akaike H. (1974). *IEEE Trans. Automatic Control*, 19, 716–723.
-5. Hosking J.R.M. (1990). *J. Royal Statistical Society B*, 52, 105–124.
-6. Schwarz G. (1978). *Annals of Statistics*, 6, 461–464.
-7. Bürkner P.C. (2017). *J. Statistical Software*, 80(1), 1–28.
-8. Backblaze Inc. (2025). Hard Drive Test Data Q3 2025.

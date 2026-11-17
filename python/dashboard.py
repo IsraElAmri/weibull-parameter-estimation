@@ -121,9 +121,19 @@ METHOD_COLORS = {
 # ─────────────────────────────────────────────────────────────────────────────
 # CACHING: DATA LOADING
 # ─────────────────────────────────────────────────────────────────────────────
-@st.cache_data(show_spinner="Loading Backblaze CSV files...", ttl=3600)
+@st.cache_data(show_spinner="Loading Backblaze data...", ttl=3600)
 def load_failure_data(data_dir: str, top3: list[str]) -> pd.DataFrame:
-    csv_files = sorted(glob.glob(os.path.join(data_dir, "*.csv")))
+    for candidate in [
+        os.path.join(_THIS_DIR, "..", "data", "drives_clean.csv"),
+        os.path.join(_THIS_DIR, "data", "drives_clean.csv"),
+        os.path.join(data_dir, "drives_clean.csv"),
+    ]:
+        if os.path.exists(candidate):
+            df = pd.read_csv(candidate)
+            df = df[df["model"].isin(top3)].copy()
+            return df
+
+        csv_files = sorted(glob.glob(os.path.join(data_dir, "*.csv")))
     if not csv_files:
         raise FileNotFoundError(f"No CSV files found in: {data_dir}")
 
